@@ -4,15 +4,35 @@ import DatePicker from 'react-datepicker';
 import './App.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Container, Input, Label, Form, FormGroup, Button } from 'reactstrap';
-
 import { Link } from 'react-router-dom';
 
 class Expenses extends Component {
-  state = {};
+  state = {
+    date: new Date(),
+    isLoading: true,
+    expenses: [],
+    Categories: [],
+  };
+
+  async componentDidMount() {
+    const response = await fetch('/api/categories');
+    const body = await response.json();
+
+    this.setState({ Categories: body, isLoading: false });
+  }
   handleChange;
 
   render() {
     const title = <h2>Add Expense</h2>;
+    const { Categories, isLoading } = this.state;
+
+    if (isLoading) return <div>Loading...</div>;
+
+    let optionList = Categories.map((category) => (
+      <option value={category.id} key={category.id}>
+        {category.name}
+      </option>
+    ));
     return (
       <div>
         <AppNav />
@@ -31,6 +51,7 @@ class Expenses extends Component {
 
             <FormGroup>
               <Label for="category">Category</Label>
+              <select>{optionList}</select>
               <Input
                 type="text"
                 name="category"
