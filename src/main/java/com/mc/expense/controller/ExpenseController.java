@@ -26,7 +26,7 @@ public class ExpenseController {
 	@Autowired
 	private ExpenseRepository expenseRepository;
 	
-	@GetMapping("/expense")
+	@GetMapping("/expenses")
 	List<Expense> getExpense(){
 		return expenseRepository.findAll();
 	}

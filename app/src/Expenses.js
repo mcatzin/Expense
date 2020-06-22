@@ -3,28 +3,46 @@ import AppNav from './AppNav';
 import DatePicker from 'react-datepicker';
 import './App.css';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Container, Input, Label, Form, FormGroup, Button } from 'reactstrap';
+import { Container, Table, Input, Label, Form, FormGroup, Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 
 class Expenses extends Component {
-  state = {
-    date: new Date(),
+  emptyItem = {
+    id: '103',
+    expensedate:new Date(),
+    description: '',
+    location: '',
+    categories: [1, 'Travel']
+  }
+
+  constructor(props){
+    super(props);
+
+    this.state ={
+      date: new Date(),
     isLoading: true,
-    expenses: [],
     Categories: [],
-  };
+    item: this.emptyItem
+    }
+  }
+
+  
 
   async componentDidMount() {
     const response = await fetch('/api/categories');
     const body = await response.json();
+    this.setState({ Categories: body});
 
-    this.setState({ Categories: body, isLoading: false });
+    const responseExp = await fetch('/api/expenses');
+    const bodyExp = await responseExp.json();
+    this.setState({ Expenses: bodyExp, isLoading: false });
   }
   handleChange;
 
   render() {
     const title = <h2>Add Expense</h2>;
-    const { Categories, isLoading } = this.state;
+    const { Categories} = this.state;
+    const {Expenses, isLoading } = this.state;
 
     if (isLoading) return <div>Loading...</div>;
 
@@ -33,6 +51,20 @@ class Expenses extends Component {
         {category.name}
       </option>
     ));
+
+
+    let rows = 
+    Expenses.map((expense) =>(
+      <tr>
+        <td>{expense.description}</td>
+        <td>{expense.location}</td>
+        <td>{expense.expensedate}</td>
+        <td>{expense.category.name}</td>
+        <td><Button size="sm" color="danger" onClick={()=>this.remove(expense.id)}/>Delete</td>
+      </tr>
+      ));
+
+
     return (
       <div>
         <AppNav />
@@ -60,7 +92,7 @@ class Expenses extends Component {
               />
             </FormGroup>
             <FormGroup>
-              <Label for="expenseDate">Expense Date</Label>
+              <Label for="expensedate">Expense Date</Label>
               <DatePicker
                 selected={this.state.date}
                 onChange={this.handleDateChange}
@@ -81,6 +113,24 @@ class Expenses extends Component {
               </Button>
             </FormGroup>
           </Form>
+        </Container>
+
+        <Container>
+          <h3>Express List</h3>
+          <Table className="mt-4">
+            <thead>
+              <tr>
+                <th width='30%'>Description</th>
+                <th width='20%'>Location</th>
+                <th>Category</th>
+                <th width='20%'>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows}
+            </tbody>
+
+          </Table>
         </Container>
       </div>
     );

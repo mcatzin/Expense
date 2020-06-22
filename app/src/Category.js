@@ -11,6 +11,7 @@ class Category extends Component {
     const response = await fetch('/api/categories');
     const body = await response.json();
     this.setState({ Category: body, isLoading: false });
+    
   }
   render() {
     const { Category, isLoading } = this.state;
