@@ -8,24 +8,39 @@ import { Link } from 'react-router-dom';
 
 class Expenses extends Component {
   emptyItem = {
-    id: '103',
-    expensedate:new Date(),
-    description: '',
-    location: '',
-    categories: [1, 'Travel']
+    description : '' ,
+        expensedate : new Date(),
+        id:104,
+        location : '',
+        category : {id:1 , name:'Travel'}
   }
 
   constructor(props){
     super(props);
 
     this.state ={
-      date: new Date(),
-    isLoading: true,
-    Categories: [],
-    item: this.emptyItem
+      isLoading :false,
+        Categories:[],
+        Expenses : [],
+        date :new Date(),
+        item : this.emptyItem
     }
   }
 
+  async remove(id){
+    await fetch(`/api/expenses/${id}` , {
+      method: 'DELETE' ,
+      headers : {
+        'Accept' : 'application/json',
+        'Content-Type' : 'application/json'
+      }
+
+    }).then(() => {
+      let updatedExpenses = [...this.state.Expenses].filter(i => i.id !== id);
+      this.setState({Expenses : updatedExpenses});
+    });
+
+}
   
 
   async componentDidMount() {
@@ -53,17 +68,16 @@ class Expenses extends Component {
     ));
 
 
-    let rows = 
+    let rows=
     Expenses.map((expense) =>(
-      <tr>
+      <tr key={expense.id}>
         <td>{expense.description}</td>
         <td>{expense.location}</td>
-        <td>{expense.expensedate}</td>
+        <td>{expense.expensedate} </td>
         <td>{expense.category.name}</td>
-        <td><Button size="sm" color="danger" onClick={()=>this.remove(expense.id)}/>Delete</td>
-      </tr>
-      ));
-
+        <td><Button size="sm" color="danger" onClick={() => this.remove(expense.id)}>Delete</Button></td>
+      </tr>)
+    )
 
     return (
       <div>
@@ -122,6 +136,7 @@ class Expenses extends Component {
               <tr>
                 <th width='30%'>Description</th>
                 <th width='20%'>Location</th>
+                <th width='20%'>Date</th>
                 <th>Category</th>
                 <th width='20%'>Action</th>
               </tr>
